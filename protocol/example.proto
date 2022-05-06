@@ -1,11 +1,36 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 option go_package = "protocol/";
 
 package protocol;
 
 service DataInterface {
+    rpc GetByFilename(FileRequest) returns (FileResponse) {}
+    rpc GetById(FileRequest) returns (FileResponse) {}
+    rpc GetAllFiles(google.protobuf.Empty) returns (FileResponse) {}
+    rpc CreateFile(FileRequest) returns (FileResponse) {}
+    rpc UpdateFile(FileRequest) returns (FileResponse) {}
+    rpc DeleteFile(FileRequest) returns (FileResponse) {}
     rpc GetChunk(ChunkRequest) returns (ChunkResponse) {}
+}
+
+message FileRecord {
+    string uuid = 1;
+    string bucket = 2;
+    string prefix = 3;
+    string filename = 4;
+    int32 chunksize = 5;
+    int64 filesize = 6;
+    repeated string chunklist = 7;
+    int64 writetime = 8;
+}
+
+message ChunkRecord {
+    string id = 1;
+    bytes data = 2;
+    int64 length = 3;
 }
 
 message ChunkRequest {
@@ -14,7 +39,15 @@ message ChunkRequest {
 
 message ChunkResponse {
     bool successful = 1;
-    string id = 2;
-    bytes data = 3;
-    int64 length = 4;
+    repeated ChunkRecord cr = 2;
+}
+
+message FileRequest {
+    FileRecord fr = 1;
+}
+
+message FileResponse {
+    bool success = 1;
+    string message = 2;
+    repeated FileRecord fr = 3;
 }

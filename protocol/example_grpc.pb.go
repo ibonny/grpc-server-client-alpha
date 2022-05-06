@@ -8,6 +8,7 @@ package protocol
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,6 +23,12 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DataInterfaceClient interface {
+	GetByFilename(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error)
+	GetById(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error)
+	GetAllFiles(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*FileResponse, error)
+	CreateFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error)
+	UpdateFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error)
+	DeleteFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error)
 	GetChunk(ctx context.Context, in *ChunkRequest, opts ...grpc.CallOption) (*ChunkResponse, error)
 }
 
@@ -31,6 +38,60 @@ type dataInterfaceClient struct {
 
 func NewDataInterfaceClient(cc grpc.ClientConnInterface) DataInterfaceClient {
 	return &dataInterfaceClient{cc}
+}
+
+func (c *dataInterfaceClient) GetByFilename(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error) {
+	out := new(FileResponse)
+	err := c.cc.Invoke(ctx, "/protocol.DataInterface/GetByFilename", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataInterfaceClient) GetById(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error) {
+	out := new(FileResponse)
+	err := c.cc.Invoke(ctx, "/protocol.DataInterface/GetById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataInterfaceClient) GetAllFiles(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*FileResponse, error) {
+	out := new(FileResponse)
+	err := c.cc.Invoke(ctx, "/protocol.DataInterface/GetAllFiles", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataInterfaceClient) CreateFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error) {
+	out := new(FileResponse)
+	err := c.cc.Invoke(ctx, "/protocol.DataInterface/CreateFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataInterfaceClient) UpdateFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error) {
+	out := new(FileResponse)
+	err := c.cc.Invoke(ctx, "/protocol.DataInterface/UpdateFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataInterfaceClient) DeleteFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error) {
+	out := new(FileResponse)
+	err := c.cc.Invoke(ctx, "/protocol.DataInterface/DeleteFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *dataInterfaceClient) GetChunk(ctx context.Context, in *ChunkRequest, opts ...grpc.CallOption) (*ChunkResponse, error) {
@@ -46,6 +107,12 @@ func (c *dataInterfaceClient) GetChunk(ctx context.Context, in *ChunkRequest, op
 // All implementations must embed UnimplementedDataInterfaceServer
 // for forward compatibility
 type DataInterfaceServer interface {
+	GetByFilename(context.Context, *FileRequest) (*FileResponse, error)
+	GetById(context.Context, *FileRequest) (*FileResponse, error)
+	GetAllFiles(context.Context, *empty.Empty) (*FileResponse, error)
+	CreateFile(context.Context, *FileRequest) (*FileResponse, error)
+	UpdateFile(context.Context, *FileRequest) (*FileResponse, error)
+	DeleteFile(context.Context, *FileRequest) (*FileResponse, error)
 	GetChunk(context.Context, *ChunkRequest) (*ChunkResponse, error)
 	mustEmbedUnimplementedDataInterfaceServer()
 }
@@ -54,6 +121,24 @@ type DataInterfaceServer interface {
 type UnimplementedDataInterfaceServer struct {
 }
 
+func (UnimplementedDataInterfaceServer) GetByFilename(context.Context, *FileRequest) (*FileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByFilename not implemented")
+}
+func (UnimplementedDataInterfaceServer) GetById(context.Context, *FileRequest) (*FileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetById not implemented")
+}
+func (UnimplementedDataInterfaceServer) GetAllFiles(context.Context, *empty.Empty) (*FileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllFiles not implemented")
+}
+func (UnimplementedDataInterfaceServer) CreateFile(context.Context, *FileRequest) (*FileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateFile not implemented")
+}
+func (UnimplementedDataInterfaceServer) UpdateFile(context.Context, *FileRequest) (*FileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateFile not implemented")
+}
+func (UnimplementedDataInterfaceServer) DeleteFile(context.Context, *FileRequest) (*FileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFile not implemented")
+}
 func (UnimplementedDataInterfaceServer) GetChunk(context.Context, *ChunkRequest) (*ChunkResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetChunk not implemented")
 }
@@ -68,6 +153,114 @@ type UnsafeDataInterfaceServer interface {
 
 func RegisterDataInterfaceServer(s grpc.ServiceRegistrar, srv DataInterfaceServer) {
 	s.RegisterService(&DataInterface_ServiceDesc, srv)
+}
+
+func _DataInterface_GetByFilename_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataInterfaceServer).GetByFilename(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protocol.DataInterface/GetByFilename",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataInterfaceServer).GetByFilename(ctx, req.(*FileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataInterface_GetById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataInterfaceServer).GetById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protocol.DataInterface/GetById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataInterfaceServer).GetById(ctx, req.(*FileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataInterface_GetAllFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataInterfaceServer).GetAllFiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protocol.DataInterface/GetAllFiles",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataInterfaceServer).GetAllFiles(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataInterface_CreateFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataInterfaceServer).CreateFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protocol.DataInterface/CreateFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataInterfaceServer).CreateFile(ctx, req.(*FileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataInterface_UpdateFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataInterfaceServer).UpdateFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protocol.DataInterface/UpdateFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataInterfaceServer).UpdateFile(ctx, req.(*FileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataInterface_DeleteFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataInterfaceServer).DeleteFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protocol.DataInterface/DeleteFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataInterfaceServer).DeleteFile(ctx, req.(*FileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _DataInterface_GetChunk_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -95,6 +288,30 @@ var DataInterface_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "protocol.DataInterface",
 	HandlerType: (*DataInterfaceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetByFilename",
+			Handler:    _DataInterface_GetByFilename_Handler,
+		},
+		{
+			MethodName: "GetById",
+			Handler:    _DataInterface_GetById_Handler,
+		},
+		{
+			MethodName: "GetAllFiles",
+			Handler:    _DataInterface_GetAllFiles_Handler,
+		},
+		{
+			MethodName: "CreateFile",
+			Handler:    _DataInterface_CreateFile_Handler,
+		},
+		{
+			MethodName: "UpdateFile",
+			Handler:    _DataInterface_UpdateFile_Handler,
+		},
+		{
+			MethodName: "DeleteFile",
+			Handler:    _DataInterface_DeleteFile_Handler,
+		},
 		{
 			MethodName: "GetChunk",
 			Handler:    _DataInterface_GetChunk_Handler,
