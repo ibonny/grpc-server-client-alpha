@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "protocol/";
+
+package protocol;
+
+service DataInterface {
+    rpc GetChunk(ChunkRequest) returns (ChunkResponse) {}
+}
+
+message ChunkRequest {
+    string id = 1;
+}
+
+message ChunkResponse {
+    bool successful = 1;
+    string id = 2;
+    bytes data = 3;
+    int64 length = 4;
+}
